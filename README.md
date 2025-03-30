@@ -15,7 +15,11 @@ rhc.py "<poly>" <poly_sym>
 
 ## Example
 
-For a polynomial: $$s^5 + s^4 + 10s^3 + 72s^2 + 152s + 240$$ with the symbol `s`, run:
+For a polynomial:
+
+$$s^5 + s^4 + 10s^3 + 72s^2 + 152s + 240$$
+
+with the symbol `s`, run:
 
 ``` bash
 python rhc.py "s^5 + s^4 + 10s^3 + 72s^2 + 152s + 240" s
