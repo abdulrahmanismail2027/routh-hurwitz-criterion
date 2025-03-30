@@ -16,8 +16,8 @@ def main():
         transformations: tuple = (
         *smp.standard_transformations, smp.implicit_multiplication_application, smp.convert_xor)
         poly: sp.Expr = smp.parse_expr(poly_str, transformations=transformations)
-    except Exception as e:
-        sys.stderr.write(f'Invalid polynomial: {e}')
+    except SyntaxError as _:
+        sys.stderr.write(f'Invalid polynomial: {poly_str}')
         return
 
     free_symbols = poly.free_symbols
