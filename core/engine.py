@@ -83,7 +83,7 @@ class RouthHurwitzCriterion:
         self.__non_neg_real_part_poles_cnt = self.__cnt_sign_changes()
 
     def __get_non_neg_real_part_roots(self) -> None:
-        self.__non_neg_real_part_poles_list = [pole for pole in sp.all_roots(self.__poly) if sp.re(pole) > 0]
+        self.__non_neg_real_part_poles_list = [sp.nsimplify(pole.evalf(), rational=False).round(5) for pole in sp.all_roots(self.__poly) if sp.re(pole) > 0]
 
     def result(self) -> dict:
         return {
