@@ -87,7 +87,7 @@ class RouthHurwitzCriterion:
 
     def result(self) -> dict:
         return {
-            'routh_array': sp.Matrix([sp.Symbol(f's^{p}') for p in range(self.__degree, -1, -1)])
+            'routh_array': sp.Matrix([sp.Symbol(f'{self.__poly_sym}^{p}') for p in range(self.__degree, -1, -1)])
                            .row_join(self.__routh_array),
             'is_stable': self.__is_stable,
             'non_neg_real_part_pole_cnt': self.__non_neg_real_part_poles_cnt,
