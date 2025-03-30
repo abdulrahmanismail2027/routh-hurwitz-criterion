@@ -7,24 +7,27 @@ from core import RouthHurwitzCriterion
 
 
 def main():
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 2:
         sys.stderr.write(f'Expected at least two arguments, received: {len(sys.argv) - 1}\n')
         return
 
-    poly_str = sys.argv[1]
-    symbol_str = sys.argv[2]
-
+    poly_str: str = sys.argv[1]
     try:
-        symbol = sp.Symbol(symbol_str)
-    except Exception as e:
-        sys.stderr.write(f'Invalid symbol: {e}')
-        return
-
-    try:
-        transformations = (*smp.standard_transformations, smp.implicit_multiplication_application, smp.convert_xor)
-        poly = smp.parse_expr(poly_str, transformations=transformations)
+        transformations: tuple = (
+        *smp.standard_transformations, smp.implicit_multiplication_application, smp.convert_xor)
+        poly: sp.Expr = smp.parse_expr(poly_str, transformations=transformations)
     except Exception as e:
         sys.stderr.write(f'Invalid polynomial: {e}')
+        return
+
+    free_symbols = poly.free_symbols
+    if len(free_symbols) != 1:
+        sys.stderr.write(f'Too many symbols in polynomial: {poly_str}\n')
+        return
+
+    symbol = free_symbols.pop()
+    if not isinstance(symbol, sp.Symbol):
+        sys.stderr.write(f'Invalid symbol in polynomial: {poly_str}\n')
         return
 
     rhc = RouthHurwitzCriterion(poly, symbol)

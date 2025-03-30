@@ -6,12 +6,11 @@ This application evaluates the stability of a system by analyzing the polynomial
 
 Run the application from the command line with the following syntax:
 
-```
-rhc.py "<poly>" <poly_sym>
+``` bash
+$ python rhc.py "<poly>"
 ```
 
 - `<poly>`: The polynomial expression to analyze (enclosed in quotes).
-- `<poly_sym>`: The symbol used in the polynomial (e.g., `s`).
 
 ## Example
 
@@ -19,16 +18,16 @@ For a polynomial:
 
 $$s^5 + s^4 + 10s^3 + 72s^2 + 152s + 240$$
 
-with the symbol `s`, run:
+run:
 
 ``` bash
-python rhc.py "s^5 + s^4 + 10s^3 + 72s^2 + 152s + 240" s
+$ python rhc.py "s^5 + s^4 + 10s^3 + 72s^2 + 152s + 240"
 ```
 
 or:
 
 ``` bash
-python rhc.py "s**5 + s**4 + 10s**3 + 72s**2 + 152s + 240" s
+$ python rhc.py "s**5 + s**4 + 10s**3 + 72s**2 + 152s + 240"
 ```
 
 ## Requirements
