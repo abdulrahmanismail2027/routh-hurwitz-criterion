@@ -34,6 +34,10 @@ def main():
         sys.stderr.write(f'Invalid symbol in polynomial: {poly_str}\n')
         return
 
+    if not sp.degree(poly, symbol).is_finite:
+        sys.stderr.write(f'Degree of polynomial is undefined: {poly_str}\n')
+        return
+
     rhc = RouthHurwitzCriterion(poly, symbol)
     rhc.analyze_system()
     result = rhc.result()
