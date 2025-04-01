@@ -15,7 +15,7 @@ class RouthHurwitzCriterion:
         self.__is_stable: bool | None = None
         self.__non_neg_real_part_poles_cnt: int | None = None
         self.__non_neg_real_part_poles_list: list[sp.Expr] = []
-        self.__epsilon = sp.Symbol('ε', real=True, positve=True)
+        self.__epsilon = sp.Symbol('ε')
 
     def __eval_limit(self, expr: sp.Expr) -> sp.Expr:
         return sp.limit(expr, self.__epsilon, 0)
