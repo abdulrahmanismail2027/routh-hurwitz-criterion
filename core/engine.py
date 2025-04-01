@@ -1,3 +1,4 @@
+import itertools as it
 import math as m
 
 import sympy as sp
@@ -49,15 +50,14 @@ class RouthHurwitzCriterion:
         self.__routh_array = sp.zeros(self.__rows, self.__cols)
 
     def __init_routh_array(self) -> None:
-        for i, p in enumerate(self.__gen_power(self.__degree)):
-            self.__routh_array[self.__index_of(self.__degree), i] = self.__poly.coeff(self.__poly_sym, p)
-            self.__routh_array[self.__index_of(self.__degree - 1), i] = self.__poly.coeff(self.__poly_sym, p - 1)
+        for (i, p), r in it.product(enumerate(self.__gen_power(self.__degree)), range(min(self.__degree + 1, 2))):
+            self.__routh_array[self.__index_of(self.__degree - r), i] = self.__poly.coeff(self.__poly_sym, p - r)
 
     def __complete_routh_array(self) -> None:
         for p in range(self.__degree - 2, -1, -1):
             v = self.__routh_array[self.__index_of(p + 1), 0]
             for j in range(0, self.__cols - 1):
-                coeff = -self.__det(self.__index_of(p + 2),0,self.__index_of(p + 1), j + 1) / v
+                coeff = -self.__det(self.__index_of(p + 2), 0, self.__index_of(p + 1), j + 1) / v
                 limit = self.__eval_limit(coeff)
                 self.__routh_array[self.__index_of(p), j] = \
                     self.__epsilon if limit == 0 and j == 0 \
@@ -83,7 +83,9 @@ class RouthHurwitzCriterion:
         self.__non_neg_real_part_poles_cnt = self.__cnt_sign_changes()
 
     def __get_non_neg_real_part_roots(self) -> None:
-        self.__non_neg_real_part_poles_list = [sp.nsimplify(pole.evalf(), rational=False).round(5) for pole in sp.all_roots(self.__poly) if sp.re(pole) > 0]
+        if self.__degree == 0: return
+        self.__non_neg_real_part_poles_list = [sp.nsimplify(pole.evalf(), rational=False).round(5)
+                                               for pole in sp.all_roots(self.__poly) if sp.re(pole) > 0]
 
     def result(self) -> dict:
         return {

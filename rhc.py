@@ -14,18 +14,22 @@ def main():
     poly_str: str = sys.argv[1]
     try:
         transformations: tuple = (
-        *smp.standard_transformations, smp.implicit_multiplication_application, smp.convert_xor)
+            *smp.standard_transformations,
+            smp.split_symbols,
+            smp.implicit_multiplication,
+            smp.convert_xor
+        )
         poly: sp.Expr = smp.parse_expr(poly_str, transformations=transformations)
     except SyntaxError as _:
         sys.stderr.write(f'Invalid polynomial: {poly_str}')
         return
 
     free_symbols = poly.free_symbols
-    if len(free_symbols) != 1:
+    if len(free_symbols) > 1:
         sys.stderr.write(f'Too many symbols in polynomial: {poly_str}\n')
         return
 
-    symbol = free_symbols.pop()
+    symbol = free_symbols.pop() if len(free_symbols) == 1 else sp.Symbol('s')
     if not isinstance(symbol, sp.Symbol):
         sys.stderr.write(f'Invalid symbol in polynomial: {poly_str}\n')
         return
