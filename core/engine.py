@@ -18,7 +18,7 @@ class RouthHurwitzCriterion:
         self.__epsilon = sp.Symbol('ε')
 
     def __eval_limit(self, expr: sp.Expr) -> sp.Expr:
-        return sp.limit(expr, self.__epsilon, 0)
+        return sp.limit(expr, self.__epsilon, 0, '+')
 
     def __eval_sign(self, expr: sp.Expr) -> int:
         return 1 if expr == self.__epsilon else sp.sign(self.__eval_limit(expr))
