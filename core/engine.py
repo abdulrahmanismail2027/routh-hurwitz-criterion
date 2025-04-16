@@ -13,7 +13,7 @@ class RouthHurwitzCriterion:
         self.__degree = sp.degree(self.__poly, self.__poly_sym)
         self.__routh_array: sp.Matrix = sp.Matrix()
         self.__is_stable: bool | None = None
-        self.__non_neg_real_part_poles_cnt: int | None = None
+        self.__non_neg_real_part_poles_cnt: int = 0
         self.__non_neg_real_part_poles_list: list[sp.Expr] = []
         self.__epsilon = sp.Symbol('ε')
 
@@ -41,8 +41,17 @@ class RouthHurwitzCriterion:
         return self.__degree - power
 
     def __det(self, x1: int, y1: int, x2: int, y2: int) -> sp.Expr:
-        return (self.__routh_array[x1, y1] * self.__routh_array[x2, y2]
-                - self.__routh_array[x2, y1] * self.__routh_array[x1, y2])
+        return (self.__routh_array[y1, x1] * self.__routh_array[y2, x2]
+                - self.__routh_array[y2, x1] * self.__routh_array[y1, x2])
+
+    def __is_zero_row(self, power: int) -> bool:
+        return all(self.__eval_limit(coeff) == 0 for coeff in self.__routh_array.row(self.__index_of(power)))
+
+    def __handle_zero_row(self, power: int) -> None:
+        aux_poly = self.__build_poly(power + 1)
+        aux_poly_diff = aux_poly.diff(self.__poly_sym)
+        self.__replace_row(power, aux_poly_diff)
+        self.__non_neg_real_part_poles_cnt += power + 1
 
     def __zero_routh_array(self) -> None:
         self.__cols = m.ceil((self.__degree + 1) / 2)
@@ -55,17 +64,16 @@ class RouthHurwitzCriterion:
 
     def __complete_routh_array(self) -> None:
         for p in range(self.__degree - 2, -1, -1):
+            if self.__is_zero_row(p + 1):
+                self.__handle_zero_row(p + 1)
+
             v = self.__routh_array[self.__index_of(p + 1), 0]
             for j in range(0, self.__cols - 1):
-                coeff = -self.__det(self.__index_of(p + 2), 0, self.__index_of(p + 1), j + 1) / v
+                coeff = -self.__det(0, self.__index_of(p + 2), j + 1, self.__index_of(p + 1)) / v
                 limit = self.__eval_limit(coeff)
                 self.__routh_array[self.__index_of(p), j] = \
                     self.__epsilon if limit == 0 and j == 0 \
                     else coeff
-            if all(self.__eval_limit(coeff) == 0 for coeff in self.__routh_array.row(self.__index_of(p))):
-                aux_poly = self.__build_poly(p + 1)
-                aux_poly_diff = aux_poly.diff(self.__poly_sym)
-                self.__replace_row(p, aux_poly_diff)
 
     def __build_routh_array(self) -> None:
         self.__zero_routh_array()
@@ -79,13 +87,13 @@ class RouthHurwitzCriterion:
     def __infer_stability(self) -> None:
         self.__is_stable = all(self.__eval_limit(coeff) > 0 for coeff in self.__routh_array.col(0))
 
-    def __cnt_non_neg_real_part_roots(self) -> None:
-        self.__non_neg_real_part_poles_cnt = self.__cnt_sign_changes()
+    def __cnt_neg_real_part_roots(self) -> None:
+        self.__non_neg_real_part_poles_cnt += self.__cnt_sign_changes()
 
     def __get_non_neg_real_part_roots(self) -> None:
         if self.__degree == 0: return
         self.__non_neg_real_part_poles_list = [sp.nsimplify(pole.evalf(), rational=False).round(5)
-                                               for pole in sp.all_roots(self.__poly) if sp.re(pole) > 0]
+                                               for pole in sp.all_roots(self.__poly) if sp.re(pole) >= 0]
 
     def result(self) -> dict:
         return {
@@ -99,5 +107,5 @@ class RouthHurwitzCriterion:
     def analyze_system(self) -> None:
         self.__build_routh_array()
         self.__infer_stability()
-        self.__cnt_non_neg_real_part_roots()
+        self.__cnt_neg_real_part_roots()
         self.__get_non_neg_real_part_roots()
